@@ -9,5 +9,6 @@ export interface IUserRepository extends IBaseRepository<UserDocument, User> {}
 
 export interface IUserService {
   create(data: SignUpDto): Promise<User>;
-  findByEmail(data: SignInDto): Promise<User | null>;
+  findById(id: string): Promise<Omit<User, 'password'> | null>;
+  findOne(data: Partial<User>): Promise<User | null>;
 }

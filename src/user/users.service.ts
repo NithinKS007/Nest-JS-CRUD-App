@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './users.entity';
-import { SignInDto, SignUpDto } from './users.dto';
+import { SignUpDto } from './users.dto';
 import type { IUserRepository, IUserService } from './user.interfaces';
 import { USER_REPOSITORY } from './user.interfaces';
 import type { IHashingService } from 'src/hashing/hashing.interface';
@@ -20,8 +20,18 @@ export class UserService implements IUserService {
     return this.userRepo.create({ ...data, password: hashedPassword });
   }
 
-  async findByEmail(data: SignInDto): Promise<User | null> {
-    const { email } = data;
-    return this.userRepo.findOne({ email: email });
+  async findOne(data: User): Promise<User | null> {
+    return this.userRepo.findOne(data);
+  }
+
+  async findById(id: string): Promise<Omit<User, 'password'> | null> {
+    const userData = await this.userRepo.findById(id);
+
+    if (!userData) {
+      throw new NotFoundException('user not found');
+    }
+    
+    const { password, ...otherDetails } = userData;
+    return otherDetails;
   }
 }

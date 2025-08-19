@@ -1,5 +1,4 @@
-export interface IJwtService {
-  sign(data: any): any;
-  verify(data: any): any;
-  decode(data: any): any;
+export interface Payload {
+  id: string;
+  role: string;
 }
