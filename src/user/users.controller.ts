@@ -7,6 +7,7 @@ import {
   Param,
   Req,
   UseGuards,
+  Version,
 } from '@nestjs/common';
 import { USER_SERVICE, type IUserService } from './user.interfaces';
 import { User } from './users.entity';
@@ -20,6 +21,7 @@ export class UserController {
   ) {}
 
   @Get(':id')
+  @Version('1')
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async findUserById(

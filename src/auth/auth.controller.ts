@@ -7,6 +7,7 @@ import {
   Req,
   Body,
   HttpCode,
+  Version,
 } from '@nestjs/common';
 import { AUTH_SERVICE, type IAuthService } from './auth.interfaces';
 import { User } from 'src/user/users.entity';
@@ -23,6 +24,7 @@ export class AuthController {
   ) {}
 
   @Post('sign-in')
+  @Version('1')
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
   async signIn(@Req() req: Request, res: Response) {
@@ -40,6 +42,7 @@ export class AuthController {
   }
 
   @Post('sign-up')
+  @Version('1')
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() data: SignUpDto) {
     const userData = await this.authService.signUp(data);
