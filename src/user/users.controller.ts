@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { UserResDto } from './users.dto';
 
-@ApiTags('auth')
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(
@@ -32,7 +32,7 @@ export class UserController {
   @Version('1')
   @ApiOperation({ summary: 'user details fetched successfully.' })
   @ApiResponse({ status: 200, description: 'success.', type: UserResDto })
-  @ApiBearerAuth()
+  @ApiBearerAuth('accesstoken')
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async findUserById(

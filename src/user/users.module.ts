@@ -5,10 +5,12 @@ import { UserController } from './users.controller';
 import { User, UserSchema } from './users.entity';
 import { UserRepository } from './users.repository';
 import { USER_REPOSITORY, USER_SERVICE } from './user.interfaces';
+import { HashingModule } from 'src/hashing/hash.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    HashingModule,
   ],
   controllers: [UserController],
   providers: [

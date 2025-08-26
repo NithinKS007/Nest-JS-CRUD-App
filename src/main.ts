@@ -17,22 +17,29 @@ async function bootstrap() {
   console.log(`mongoose db connected ${mongoose}`);
   app.useGlobalPipes(new ValidationPipe());
 
+  app.use(helmet());
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
+
   const config = new DocumentBuilder()
     .setTitle('We-Swipe API')
     .setDescription('API documentation for We-Swipe social media backend')
     .setVersion('1.0')
     .addTag('auth')
     .addTag('users')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'accesstoken',
+    )
     .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
-
-  app.use(helmet());
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-  });
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
 
   await app.listen(port);
 }

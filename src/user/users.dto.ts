@@ -87,7 +87,10 @@ export class UserResDto extends OmitType(UserDto, ['password'] as const) {
   id: string;
 }
 
-export class SignUpResDto extends UserResDto {}
+export class SignUpResDto extends UserResDto {
+  @ApiProperty({ type: () => UserResDto })
+  user: UserResDto;
+}
 
 export class SignInResDto {
   @ApiProperty({ type: () => UserResDto })

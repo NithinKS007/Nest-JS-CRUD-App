@@ -12,7 +12,12 @@ import {
 import { AUTH_SERVICE, type IAuthService } from './auth.interfaces';
 import { AuthGuard } from '@nestjs/passport';
 import type { Response } from 'express';
-import { SignInDto, SignInResDto, SignUpDto, SignUpResDto } from 'src/user/users.dto';
+import {
+  SignInDto,
+  SignInResDto,
+  SignUpDto,
+  SignUpResDto,
+} from 'src/user/users.dto';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -34,7 +39,10 @@ export class AuthController {
   })
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
-  async signIn(@Res() res: Response, @Body() data: SignInDto) {
+  async signIn(
+    @Res({ passthrough: true }) res: Response,
+    @Body() data: SignInDto,
+  ): Promise<SignInResDto>  {
     const mode = this.configService.get<string>('app.mode') === 'PRODUCTION';
 
     const { accessToken, refreshToken, userData } =
@@ -45,7 +53,7 @@ export class AuthController {
       secure: mode,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    return { accessToken, user: userData };
+    return { accessToken, user: userData } as SignInResDto
   }
 
   @Post('sign-up')
@@ -53,8 +61,8 @@ export class AuthController {
   @ApiOperation({ summary: 'sign up user and return created user data' })
   @ApiResponse({ status: 201, description: 'success.', type: SignUpResDto })
   @HttpCode(HttpStatus.CREATED)
-  async signUp(@Body() data: SignUpDto) {
+  async signUp(@Body() data: SignUpDto):Promise<SignUpResDto> {
     const userData = await this.authService.signUp(data);
-    return { user: userData };
+    return { user: userData } as SignUpResDto
   }
 }
