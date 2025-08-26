@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { VersioningType } from '@nestjs/common';
-// import 'src/types/express';
 import helmet from 'helmet';
 
 async function bootstrap() {
@@ -19,10 +18,12 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('We-Swipe API')
+    .setDescription('API documentation for We-Swipe social media backend')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('auth')
+    .addTag('users')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
@@ -32,7 +33,7 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: '1',
   });
-  
+
   await app.listen(port);
 }
 bootstrap();

@@ -4,18 +4,19 @@ import {
   Inject,
   HttpStatus,
   UseGuards,
-  Req,
   Body,
   HttpCode,
   Version,
+  Res,
 } from '@nestjs/common';
 import { AUTH_SERVICE, type IAuthService } from './auth.interfaces';
-import { User } from 'src/user/users.entity';
 import { AuthGuard } from '@nestjs/passport';
-import type { Request, Response } from 'express';
-import { SignUpDto } from 'src/user/users.dto';
+import type { Response } from 'express';
+import { SignInDto, SignInResDto, SignUpDto, SignUpResDto } from 'src/user/users.dto';
 import { ConfigService } from '@nestjs/config';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -25,13 +26,19 @@ export class AuthController {
 
   @Post('sign-in')
   @Version('1')
+  @ApiOperation({ summary: 'sign in user and return access token, user data' })
+  @ApiResponse({
+    status: 200,
+    description: 'success.',
+    type: SignInResDto,
+  })
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
-  async signIn(@Req() req: Request, res: Response) {
-    const user = req.user;
+  async signIn(@Res() res: Response, @Body() data: SignInDto) {
     const mode = this.configService.get<string>('app.mode') === 'PRODUCTION';
+
     const { accessToken, refreshToken, userData } =
-      await this.authService.signIn(user as User);
+      await this.authService.signIn(data);
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: mode ? 'none' : 'strict',
@@ -43,6 +50,8 @@ export class AuthController {
 
   @Post('sign-up')
   @Version('1')
+  @ApiOperation({ summary: 'sign up user and return created user data' })
+  @ApiResponse({ status: 201, description: 'success.', type: SignUpResDto })
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() data: SignUpDto) {
     const userData = await this.authService.signUp(data);

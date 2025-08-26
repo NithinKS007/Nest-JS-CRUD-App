@@ -68,11 +68,12 @@ export class AuthService implements IAuthService {
     return result;
   }
 
-  async signIn(userData: Omit<User, 'password'>): Promise<{
+  async signIn(data:SignInDto): Promise<{
     accessToken: string;
     refreshToken: string;
     userData: Omit<User, 'password'>;
   }> {
+    const userData = await this.validateUser(data);
     const tokens = await this.generateTokens(userData);
     return { ...tokens, userData };
   }
