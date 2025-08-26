@@ -12,7 +12,7 @@ import {
 import { USER_SERVICE, type IUserService } from './user.interfaces';
 import { User } from './users.entity';
 import { AuthGuard } from '@nestjs/passport';
-import type { Request } from 'express';
+import type { customReq } from 'src/types/express';
 
 @Controller('users')
 export class UserController {
@@ -26,7 +26,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async findUserById(
     @Param('id') id: string,
-    @Req() req: Request,
+    @Req() req: customReq,
   ): Promise<Omit<User, 'password'> | null> {
     const userId = req?.user?.id || req.params.id;
     const userData = await this.userService.findById(userId);

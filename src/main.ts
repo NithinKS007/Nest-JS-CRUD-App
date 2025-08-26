@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { VersioningType } from '@nestjs/common';
-import 'src/types/express';
+// import 'src/types/express';
 import helmet from 'helmet';
 
 async function bootstrap() {

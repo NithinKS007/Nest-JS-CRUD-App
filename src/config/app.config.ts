@@ -1,4 +1,4 @@
-export default () => ({
+export default (): AppConfig => ({
   db: {
     mongodb: {
       compassUrl: process.env.COMPASS_DATABASE_CONFIG || '',
@@ -8,10 +8,30 @@ export default () => ({
     port: parseInt(process.env.PORT || '3000', 10),
     mode: process.env.MODE || 'DEVELOPMENT',
   },
-  jwt:{
-    accessTokenSecret: process.env.JWT_ACCESS_TOKEN_SECRET || 'default-access-secret',
+  jwt: {
+    accessTokenSecret:
+      process.env.JWT_ACCESS_TOKEN_SECRET || 'default-access-secret',
     accessTokenExpiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION || '15m',
-    refreshTokenSecret: process.env.JWT_REFRESH_TOKEN_SECRET || 'default-refresh-secret',
+    refreshTokenSecret:
+      process.env.JWT_REFRESH_TOKEN_SECRET || 'default-refresh-secret',
     refreshTokenExpiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION || '7d',
-  }
+  },
 });
+
+interface AppConfig {
+  db: {
+    mongodb: {
+      compassUrl: string;
+    };
+  };
+  app: {
+    port: number;
+    mode: string;
+  };
+  jwt: {
+    accessTokenSecret: string;
+    accessTokenExpiresIn: string;
+    refreshTokenSecret: string;
+    refreshTokenExpiresIn: string;
+  };
+}

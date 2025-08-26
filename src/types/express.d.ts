@@ -1,9 +1,6 @@
-import type { Payload } from 'src/auth/jwt/jwt.interface';
+import { Request } from 'express';
+import type { Payload } from '../auth/jwt/jwt.interface';
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: Payload;
-    }
-  }
+export interface customReq extends Request {
+  user?: Payload;
 }
