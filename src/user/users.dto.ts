@@ -13,9 +13,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { OmitType, PickType } from '@nestjs/mapped-types';
 
-enum UserRole {
+export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
 }
@@ -68,26 +67,75 @@ export class UserDto {
   role: UserRole;
 }
 
-export class SignUpDto extends PickType(UserDto, [
-  'fName',
-  'lName',
-  'age',
-  'image',
-  'email',
-  'password',
-] as const) {}
-
-export class SignInDto extends PickType(UserDto, [
-  'email',
-  'password',
-] as const) {}
-
-export class UserResDto extends OmitType(UserDto, ['password'] as const) {
+export class SignUpDto {
   @ApiProperty()
-  id: string;
+  fName: string;
+
+  @ApiProperty()
+  lName: string;
+
+  @ApiProperty()
+  age: number;
+
+  @ApiProperty()
+  image: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  password: string;
 }
 
-export class SignUpResDto extends UserResDto {
+export class SignInDto {
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  password: string;
+}
+
+export class UserResDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  fName: string;
+
+  @ApiProperty()
+  lName: string;
+
+  @ApiProperty()
+  age: number;
+
+  @ApiProperty()
+  image: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  isBlocked: boolean;
+
+  @ApiProperty({ enum: UserRole })
+  role: UserRole;
+
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    description: 'Timestamp when the user was created',
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    description: 'Timestamp when the user was last updated',
+  })
+  updatedAt: Date;
+}
+
+export class SignUpResDto {
   @ApiProperty({ type: () => UserResDto })
   user: UserResDto;
 }

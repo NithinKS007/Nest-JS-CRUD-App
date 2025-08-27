@@ -3,14 +3,12 @@ import {
   Post,
   Inject,
   HttpStatus,
-  UseGuards,
   Body,
   HttpCode,
   Version,
   Res,
 } from '@nestjs/common';
 import { AUTH_SERVICE, type IAuthService } from './auth.interfaces';
-import { AuthGuard } from '@nestjs/passport';
 import type { Response } from 'express';
 import {
   SignInDto,
@@ -19,7 +17,11 @@ import {
   SignUpResDto,
 } from 'src/user/users.dto';
 import { ConfigService } from '@nestjs/config';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import {
+  SignInSwaggerDoc,
+  SignUpSwaggerDoc,
+} from 'src/shared/decorators/swagger.doc.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -31,18 +33,12 @@ export class AuthController {
 
   @Post('sign-in')
   @Version('1')
-  @ApiOperation({ summary: 'sign in user and return access token, user data' })
-  @ApiResponse({
-    status: 200,
-    description: 'success.',
-    type: SignInResDto,
-  })
-  @UseGuards(AuthGuard('local'))
+  @SignInSwaggerDoc()
   @HttpCode(HttpStatus.OK)
   async signIn(
     @Res({ passthrough: true }) res: Response,
     @Body() data: SignInDto,
-  ): Promise<SignInResDto>  {
+  ): Promise<SignInResDto> {
     const mode = this.configService.get<string>('app.mode') === 'PRODUCTION';
 
     const { accessToken, refreshToken, userData } =
@@ -53,16 +49,15 @@ export class AuthController {
       secure: mode,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    return { accessToken, user: userData } as SignInResDto
+    return { accessToken, user: userData } as SignInResDto;
   }
 
   @Post('sign-up')
   @Version('1')
-  @ApiOperation({ summary: 'sign up user and return created user data' })
-  @ApiResponse({ status: 201, description: 'success.', type: SignUpResDto })
+  @SignUpSwaggerDoc()
   @HttpCode(HttpStatus.CREATED)
-  async signUp(@Body() data: SignUpDto):Promise<SignUpResDto> {
+  async signUp(@Body() data: SignUpDto): Promise<SignUpResDto> {
     const userData = await this.authService.signUp(data);
-    return { user: userData } as SignUpResDto
+    return { user: userData } as SignUpResDto;
   }
 }

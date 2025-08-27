@@ -3,7 +3,7 @@ import {
   Inject,
   NotFoundException,
   UnauthorizedException,
-  BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { USER_SERVICE } from 'src/user/user.interfaces';
 import type { IUserService } from 'src/user/user.interfaces';
@@ -29,7 +29,7 @@ export class AuthService implements IAuthService {
     const findExistingOne = await this.userService.findOne({ email });
 
     if (findExistingOne) {
-      throw new BadRequestException('Email already exists');
+      throw new ConflictException('Email already exists');
     }
 
     const userData = await this.userService.create(data);
