@@ -23,13 +23,19 @@ export class User {
   isBlocked: boolean;
 
   @Prop({ required: true, enum: ['user', 'admin'], default: 'user' })
-  role: string;
+  role: 'user' | 'admin';
 
   @Prop({ required: true, unique: true })
   email: string;
 
   @Prop({ required: true })
   password: string;
+
+  @Prop({ required: false })
+  createdAt: Date;
+
+  @Prop({ required: false })
+  updatedAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

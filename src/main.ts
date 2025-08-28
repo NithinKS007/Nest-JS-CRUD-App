@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
+import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,6 +24,8 @@ async function bootstrap() {
     defaultVersion: '1',
   });
 
+  app.useGlobalInterceptors(new TransformInterceptor());
+
   const config = new DocumentBuilder()
     .setTitle('We-Swipe API')
     .setDescription('API documentation for We-Swipe social media backend')
@@ -39,6 +42,7 @@ async function bootstrap() {
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
+
   SwaggerModule.setup('api-docs', app, document);
 
   await app.listen(port);

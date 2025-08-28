@@ -9,15 +9,9 @@ import {
   IsUrl,
   MinLength,
   MaxLength,
-  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-
-export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
-}
 
 export class UserDto {
   @ApiProperty()
@@ -59,12 +53,6 @@ export class UserDto {
   @Type(() => Boolean)
   @IsBoolean()
   isBlocked: boolean;
-
-  @ApiProperty({ enum: UserRole })
-  @IsEnum(UserRole, {
-    message: `role must be one of: ${Object.values(UserRole).join(', ')}`,
-  })
-  role: UserRole;
 }
 
 export class SignUpDto {
@@ -117,8 +105,8 @@ export class UserResDto {
   @ApiProperty()
   isBlocked: boolean;
 
-  @ApiProperty({ enum: UserRole })
-  role: UserRole;
+  @ApiProperty()
+  role: 'user' | 'admin';;
 
   @ApiProperty({
     type: String,

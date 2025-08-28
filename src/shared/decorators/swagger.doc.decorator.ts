@@ -1,14 +1,21 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import {
-  ApiBody,
   ApiOperation,
   ApiResponse,
+  ApiBody,
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
   ApiNotFoundResponse,
   ApiConflictResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
-import { SignInDto, SignInResDto, SignUpDto, SignUpResDto } from 'src/user/users.dto';
+import {
+  SignInDto,
+  SignInResDto,
+  SignUpDto,
+  SignUpResDto,
+  UserResDto,
+} from 'src/user/users.dto';
 
 type ErrorResponse = {
   status: number;
@@ -24,9 +31,26 @@ interface SwaggerDocOptions {
     type: Type<unknown>;
   };
   errors?: ErrorResponse[];
+  bearerAuth?: boolean;
 }
 
-export function SwaggerDoc(options: SwaggerDocOptions) {
+import { ApiProperty } from '@nestjs/swagger';
+
+export class CustomApiResponse<T> {
+  @ApiProperty()
+  success?: boolean;
+
+  @ApiProperty()
+  statusCode?: number;
+
+  @ApiProperty({ example: 'Operation successful' })
+  message: string;
+
+  @ApiProperty()
+  data: T;
+}
+
+export const SwaggerDoc = (options: SwaggerDocOptions) => {
   const decorators = [
     ApiOperation({ summary: options.summary }),
     ApiResponse({
@@ -40,30 +64,44 @@ export function SwaggerDoc(options: SwaggerDocOptions) {
     decorators.push(ApiBody({ type: options.body }));
   }
 
+  if (options.bearerAuth) {
+    decorators.push(ApiBearerAuth('accesstoken'));
+  }
+
   (options.errors || []).forEach((error) => {
     switch (error.status) {
       case 400:
-        decorators.push(ApiBadRequestResponse({ description: error.description }));
+        decorators.push(
+          ApiBadRequestResponse({ description: error.description }),
+        );
         break;
       case 401:
-        decorators.push(ApiUnauthorizedResponse({ description: error.description }));
+        decorators.push(
+          ApiUnauthorizedResponse({ description: error.description }),
+        );
         break;
       case 404:
-        decorators.push(ApiNotFoundResponse({ description: error.description }));
+        decorators.push(
+          ApiNotFoundResponse({ description: error.description }),
+        );
         break;
       case 409:
-        decorators.push(ApiConflictResponse({ description: error.description }));
+        decorators.push(
+          ApiConflictResponse({ description: error.description }),
+        );
         break;
       default:
-        decorators.push(ApiResponse({ status: error.status, description: error.description }));
+        decorators.push(
+          ApiResponse({ status: error.status, description: error.description }),
+        );
     }
   });
 
   return applyDecorators(...decorators);
-}
+};
 
-export function SignInSwaggerDoc() {
-  return SwaggerDoc({
+export const SignInSwaggerDoc = () =>
+  SwaggerDoc({
     summary: 'Sign in user and return token',
     body: SignInDto,
     response: {
@@ -77,10 +115,9 @@ export function SignInSwaggerDoc() {
       { status: 404, description: 'Email not found' },
     ],
   });
-}
 
-export function SignUpSwaggerDoc() {
-  return SwaggerDoc({
+export const SignUpSwaggerDoc = () =>
+  SwaggerDoc({
     summary: 'Register a new user',
     body: SignUpDto,
     response: {
@@ -93,6 +130,15 @@ export function SignUpSwaggerDoc() {
       { status: 409, description: 'Email already exists' },
     ],
   });
-}
 
-
+export const FindUserByIdDoc = () =>
+  SwaggerDoc({
+    summary: 'Fetch user by ID',
+    response: {
+      status: 200,
+      description: 'User details fetched successfully.',
+      type: UserResDto,
+    },
+    bearerAuth: true,
+    errors: [{ status: 404, description: 'User not found' }],
+  });
