@@ -32,6 +32,7 @@
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "csrf-csrf": "^4.0.3",
     "helmet": "^8.1.0",
     "joi": "^18.0.0",
     "mongoose": "^8.17.0",

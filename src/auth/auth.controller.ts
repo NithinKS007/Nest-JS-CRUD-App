@@ -10,6 +10,8 @@ import {
   Patch,
   UseGuards,
   Req,
+  Get,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AUTH_SERVICE, type IAuthService } from './auth.interfaces';
 import type { Response } from 'express';
@@ -90,4 +92,28 @@ export class AuthController {
       data: null,
     };
   }
+
+  @Post('refresh')
+  @Version('1')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @Req() req: customReq,
+  ): Promise<CustomApiResponse<{ accessToken: string }>> {
+    const refreshToken: string = req.cookies?.refreshToken;
+
+    const { accessToken } = await this.authService.refreshTokens(refreshToken);
+    return {
+      message: 'Access token refreshed successfully',
+      data: { accessToken },
+    };
+  }
+
+  // @Get('csrf-token')
+  // @Version('1')
+  // @UseGuards(AuthGuard('jwt'))
+  // @HttpCode(HttpStatus.OK)
+  // async csrfToken(): Promise<void> {
+  //   return;
+  // }
 }

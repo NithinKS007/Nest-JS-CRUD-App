@@ -14,4 +14,6 @@ export interface IAuthService {
     oldPassword: string;
     newPassword: string;
   }): Promise<void>;
+
+  refreshTokens(refreshToken: string): Promise<{ accessToken: string }>
 }

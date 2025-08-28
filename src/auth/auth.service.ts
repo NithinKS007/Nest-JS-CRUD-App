@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { USER_SERVICE } from 'src/user/user.interfaces';
 import type { IUserService } from 'src/user/user.interfaces';
@@ -123,5 +124,23 @@ export class AuthService implements IAuthService {
     if (!updatedPassword) {
       throw new BadRequestException('Failed to update password');
     }
+  }
+  async refreshTokens(refreshToken: string): Promise<{ accessToken: string }> {
+    if (!refreshToken) {
+      throw new ForbiddenException(
+        'Refresh token not found, Please try again later',
+      );
+    }
+    const decoded = await this.jwtservice.verifyAsync(refreshToken);
+
+    const newAccessToken = await this.jwtservice.signAsync(
+      { id: decoded.id, role: decoded.role },
+      {
+        secret: this.configService.get<string>('jwt.accessTokenSecret'),
+        expiresIn: this.configService.get<string>('jwt.accessTokenExpiresIn'),
+      },
+    );
+
+    return { accessToken: newAccessToken };
   }
 }
