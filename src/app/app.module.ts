@@ -5,6 +5,8 @@ import appConfig from './../config/app.config';
 import { MongooseConfigService } from './mongoose.config.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/user/users.module';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerConfigService } from './throttle.config.service';
 
 @Module({
   imports: [
@@ -15,6 +17,10 @@ import { UsersModule } from 'src/user/users.module';
     }),
     AuthModule,
     UsersModule,
+     ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: ThrottlerConfigService,
+    }),
   ],
   controllers: [],
   providers: [],
