@@ -14,4 +14,6 @@ export const validationSchema = Joi.object({
 
   JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
   JWT_REFRESH_TOKEN_EXPIRATION: Joi.string().default('7d'),
+
+  CSRF_SECRET: Joi.string().required(),
 });

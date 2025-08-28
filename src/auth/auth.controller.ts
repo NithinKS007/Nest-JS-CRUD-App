@@ -11,7 +11,6 @@ import {
   UseGuards,
   Req,
   Get,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AUTH_SERVICE, type IAuthService } from './auth.interfaces';
 import type { Response } from 'express';
@@ -30,6 +29,8 @@ import {
 } from 'src/shared/decorators/swagger.doc.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import type { customReq } from 'src/types/express';
+import { createCsrfProtection } from 'src/shared/csrf.config';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -37,6 +38,7 @@ export class AuthController {
   constructor(
     @Inject(AUTH_SERVICE) private readonly authService: IAuthService,
     private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Post('sign-in')
@@ -109,11 +111,23 @@ export class AuthController {
     };
   }
 
-  // @Get('csrf-token')
-  // @Version('1')
-  // @UseGuards(AuthGuard('jwt'))
-  // @HttpCode(HttpStatus.OK)
-  // async csrfToken(): Promise<void> {
-  //   return;
-  // }
+  @Get('csrf-token')
+  @Version('1')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  async getCsrfToken(
+    @Req() req: customReq,
+    @Res() res: Response,
+  ): Promise<CustomApiResponse<{ token: string }>> {
+    const { generateCsrfToken } = createCsrfProtection(
+      this.configService,
+      this.jwtService,
+    );
+
+    const token = generateCsrfToken(req, res);
+    return {
+      message: 'CSRF token generated successfully',
+      data: { token },
+    };
+  }
 }

@@ -16,6 +16,7 @@ import { HASHING_SERVICE } from 'src/hashing/hashing.interface';
 import type { IHashingService } from 'src/hashing/hashing.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { createCsrfProtection } from 'src/shared/csrf.config';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -143,4 +144,13 @@ export class AuthService implements IAuthService {
 
     return { accessToken: newAccessToken };
   }
+
+  // async generateCsrfToken(): Promise<string> {
+  //   const { generateCsrfToken } = createCsrfProtection(
+  //     this.configService,
+  //     this.jwtservice,
+  //   );
+
+  //   const token = generateCsrfToken()
+  // }
 }

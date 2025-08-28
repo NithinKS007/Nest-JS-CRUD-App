@@ -16,6 +16,9 @@ export default (): AppConfig => ({
       process.env.JWT_REFRESH_TOKEN_SECRET || 'default-refresh-secret',
     refreshTokenExpiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION || '7d',
   },
+  csrf :{
+    secret: process.env.CSRF_SECRET || 'default-csrf-secret'
+  }
 });
 
 interface AppConfig {
@@ -34,4 +37,7 @@ interface AppConfig {
     refreshTokenSecret: string;
     refreshTokenExpiresIn: string;
   };
+  csrf: {
+    secret: string;
+  }
 }

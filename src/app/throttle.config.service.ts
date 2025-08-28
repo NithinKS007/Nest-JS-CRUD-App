@@ -1,4 +1,3 @@
-// throttler-config.service.ts
 import { Injectable } from '@nestjs/common';
 import {
   ThrottlerOptionsFactory,

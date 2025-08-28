@@ -15,5 +15,6 @@ export interface IAuthService {
     newPassword: string;
   }): Promise<void>;
 
-  refreshTokens(refreshToken: string): Promise<{ accessToken: string }>
+  refreshTokens(refreshToken: string): Promise<{ accessToken: string }>;
+  // generateCsrfToken(): Promise<string>;
 }
