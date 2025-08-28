@@ -14,7 +14,10 @@ import { User } from './users.entity';
 import { AuthGuard } from '@nestjs/passport';
 import type { customReq } from 'src/types/express';
 import { ApiTags } from '@nestjs/swagger';
-import { FindUserByIdDoc } from 'src/shared/decorators/swagger.doc.decorator';
+import {
+  CustomApiResponse,
+  FindUserByIdDoc,
+} from 'src/shared/decorators/swagger.doc.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -31,9 +34,9 @@ export class UserController {
   async findUserById(
     @Param('id') id: string,
     @Req() req: customReq,
-  ): Promise<Omit<User, 'password'> | null> {
+  ): Promise<CustomApiResponse<Omit<User, 'password'> | null>> {
     const userId = req?.user?.id || req.params.id;
     const userData = await this.userService.findById(userId);
-    return userData;
+    return { data: userData, message: 'User found successfully' };
   }
 }

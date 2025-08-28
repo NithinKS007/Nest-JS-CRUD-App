@@ -4,6 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { USER_SERVICE } from 'src/user/user.interfaces';
 import type { IUserService } from 'src/user/user.interfaces';
@@ -68,7 +69,7 @@ export class AuthService implements IAuthService {
     return result;
   }
 
-  async signIn(data:SignInDto): Promise<{
+  async signIn(data: SignInDto): Promise<{
     accessToken: string;
     refreshToken: string;
     userData: Omit<User, 'password'>;
@@ -91,5 +92,36 @@ export class AuthService implements IAuthService {
     });
 
     return { accessToken, refreshToken };
+  }
+
+  async changePassword(data: {
+    userId: string;
+    oldPassword: string;
+    newPassword: string;
+  }): Promise<void> {
+    const { oldPassword, newPassword, userId } = data;
+
+    const userData = await this.userService.findById(userId);
+
+    if (!userData) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isMatch = await this.hashingService.compare(
+      oldPassword,
+      userData.password,
+    );
+
+    if (!isMatch) {
+      throw new UnauthorizedException('Incorrect old password');
+    }
+
+    const updatedPassword = await this.userService.update(userData.id, {
+      password: newPassword,
+    });
+
+    if (!updatedPassword) {
+      throw new BadRequestException('Failed to update password');
+    }
   }
 }

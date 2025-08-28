@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from './users.entity';
 import { SignUpDto } from './users.dto';
 import type { IUserRepository, IUserService } from './user.interfaces';
@@ -24,14 +29,21 @@ export class UserService implements IUserService {
     return this.userRepo.findOne(data);
   }
 
-  async findById(id: string): Promise<Omit<User, 'password'> | null> {
+  async findById(id: string): Promise<User | null> {
     const userData = await this.userRepo.findById(id);
 
     if (!userData) {
       throw new NotFoundException('user not found');
     }
-    
-    const { password, ...otherDetails } = userData;
-    return otherDetails;
+
+    return userData;
+  }
+
+  async update(id: string, data: Partial<User>): Promise<User | null> {
+    const updatedUser = await this.userRepo.update(id, data);
+    if (!updatedUser) {
+      throw new BadRequestException('Failed to update user');
+    }
+    return updatedUser;
   }
 }

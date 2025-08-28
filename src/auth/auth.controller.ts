@@ -8,6 +8,8 @@ import {
   Version,
   Res,
   Patch,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AUTH_SERVICE, type IAuthService } from './auth.interfaces';
 import type { Response } from 'express';
@@ -24,6 +26,8 @@ import {
   SignInSwaggerDoc,
   SignUpSwaggerDoc,
 } from 'src/shared/decorators/swagger.doc.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import type { customReq } from 'src/types/express';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -33,7 +37,7 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
-  @Post('sign-in')  
+  @Post('sign-in')
   @Version('1')
   @SignInSwaggerDoc()
   @HttpCode(HttpStatus.OK)
@@ -51,7 +55,7 @@ export class AuthController {
       secure: mode,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-     return {
+    return {
       message: 'Successfully signed in',
       data: { accessToken, user: userData },
     };
@@ -61,20 +65,29 @@ export class AuthController {
   @Version('1')
   @SignUpSwaggerDoc()
   @HttpCode(HttpStatus.CREATED)
-  async signUp(@Body() data: SignUpDto): Promise<CustomApiResponse<SignUpResDto>> {
+  async signUp(
+    @Body() data: SignUpDto,
+  ): Promise<CustomApiResponse<SignUpResDto>> {
     const userData = await this.authService.signUp(data);
-   return {
+    return {
       message: 'User registered successfully',
       data: { user: userData },
     };
   }
 
-  // @Patch('change-password')
-  // @Version('1')
-  // @HttpCode(HttpStatus.OK)
-  // async changePassword(
-  //   @Body() data: { oldPassword: string; newPassword: string },
-  // ): Promise<void> {
-  //   await this.authService.changePassword(data);
-  // }
+  @Patch('change-password')
+  @Version('1')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @Body() data: { oldPassword: string; newPassword: string },
+    @Req() req: customReq,
+  ): Promise<CustomApiResponse<null>> {
+    const inputData = { ...data, userId: req?.user?.id };
+    await this.authService.changePassword(inputData);
+    return {
+      message: 'Password changed successfully',
+      data: null,
+    };
+  }
 }
