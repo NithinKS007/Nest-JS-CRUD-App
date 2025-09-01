@@ -17,6 +17,10 @@ async function bootstrap() {
 
   const port = configService.get('app.port');
   const mongoose = configService.get('db.mongodb.compassUrl');
+  const allowedOrigins = configService
+    .get<string>('CORS_ORIGIN')
+    ?.split(',')
+    .map((o) => o.trim());
 
   console.log(`server running at ${port}`);
   console.log(`mongoose db connected ${mongoose}`);
@@ -37,6 +41,17 @@ async function bootstrap() {
 
   app.use(cookieparser());
   app.use(doubleCsrfProtection);
+  app.enableCors({
+    origin: (origin: string | undefined, callback: Function) => {
+      if (!origin || allowedOrigins?.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('We-Swipe API')
