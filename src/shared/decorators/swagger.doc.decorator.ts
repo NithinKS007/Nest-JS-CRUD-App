@@ -8,6 +8,7 @@ import {
   ApiNotFoundResponse,
   ApiConflictResponse,
   ApiBearerAuth,
+  ApiExtraModels,
 } from '@nestjs/swagger';
 import {
   SignInDto,
@@ -141,4 +142,42 @@ export const FindUserByIdDoc = () =>
     },
     bearerAuth: true,
     errors: [{ status: 404, description: 'User not found' }],
+  });
+
+@ApiExtraModels(UserResDto)
+export class PaginatedUserResponseDto {
+  @ApiProperty({ type: [UserResDto] })
+  data: UserResDto[];
+
+  @ApiProperty()
+  totalPages: number;
+
+  @ApiProperty()
+  currentPage: number;
+
+  @ApiProperty()
+  message: string;
+
+  @ApiProperty()
+  success?: boolean;
+
+  @ApiProperty()
+  statusCode?: number;
+}
+
+export const FindAllUsersDoc = () =>
+  SwaggerDoc({
+    summary: 'Fetch all users with pagination',
+    response: {
+      status: 200,
+      description: 'Users details fetched successfully.',
+      type: PaginatedUserResponseDto,
+    },
+    bearerAuth: true,
+    errors: [
+      {
+        status: 401,
+        description: 'Unauthorized',
+      },
+    ],
   });

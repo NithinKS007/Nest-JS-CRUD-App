@@ -17,7 +17,9 @@ import type { customReq } from 'src/types/express';
 import { ApiTags } from '@nestjs/swagger';
 import {
   CustomApiResponse,
+  FindAllUsersDoc,
   FindUserByIdDoc,
+  PaginatedUserResponseDto,
 } from 'src/shared/decorators/swagger.doc.decorator';
 import { QueryParamsDto } from './users.dto';
 
@@ -44,21 +46,18 @@ export class UserController {
 
   @Get()
   @Version('1')
+  @FindAllUsersDoc()
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async findAll(
     @Query() query: QueryParamsDto,
-  ): Promise<
-    CustomApiResponse<{ data: User[]; totalPages: number; currentPage: number }>
-  > {
+  ): Promise<PaginatedUserResponseDto> {
     const { data, totalPages, currentPage } =
       await this.userService.findAll(query);
     return {
-      data: {
-        data,
-        totalPages,
-        currentPage,
-      },
+      data,
+      totalPages,
+      currentPage,
       message: 'Users details fetched successfully',
     };
   }
