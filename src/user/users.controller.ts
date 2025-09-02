@@ -22,6 +22,8 @@ import {
   PaginatedUserResponseDto,
 } from 'src/shared/decorators/swagger.doc.decorator';
 import { QueryParamsDto } from './users.dto';
+import { RolesGuard } from 'src/shared/guards/role.guard';
+import { Roles } from 'src/shared/decorators/roles.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -47,7 +49,8 @@ export class UserController {
   @Get()
   @Version('1')
   @FindAllUsersDoc()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'),RolesGuard)
+  @Roles('admin')
   @HttpCode(HttpStatus.OK)
   async findAll(
     @Query() query: QueryParamsDto,
