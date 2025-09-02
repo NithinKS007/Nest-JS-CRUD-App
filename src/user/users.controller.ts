@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Inject,
   Param,
+  Query,
   Req,
   UseGuards,
   Version,
@@ -18,6 +19,7 @@ import {
   CustomApiResponse,
   FindUserByIdDoc,
 } from 'src/shared/decorators/swagger.doc.decorator';
+import { QueryParamsDto } from './users.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -38,5 +40,26 @@ export class UserController {
     const userId = req?.user?.id || req.params.id;
     const userData = await this.userService.findById(userId);
     return { data: userData, message: 'User found successfully' };
+  }
+
+  @Get()
+  @Version('1')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  async findAll(
+    @Query() query: QueryParamsDto,
+  ): Promise<
+    CustomApiResponse<{ data: User[]; totalPages: number; currentPage: number }>
+  > {
+    const { data, totalPages, currentPage } =
+      await this.userService.findAll(query);
+    return {
+      data: {
+        data,
+        totalPages,
+        currentPage,
+      },
+      message: 'Users details fetched successfully',
+    };
   }
 }

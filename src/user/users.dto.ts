@@ -9,9 +9,13 @@ import {
   IsUrl,
   MinLength,
   MaxLength,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+// utils/types.ts or common/types.ts
+import { FilterQuery } from 'mongoose';
 
 export class UserDto {
   @ApiProperty()
@@ -106,7 +110,7 @@ export class UserResDto {
   isBlocked: boolean;
 
   @ApiProperty()
-  role: 'user' | 'admin';;
+  role: 'user' | 'admin';
 
   @ApiProperty({
     type: String,
@@ -134,4 +138,46 @@ export class SignInResDto {
 
   @ApiProperty()
   accessToken: string;
+}
+
+export class QueryParamsDto {
+  @ApiPropertyOptional({ default: 1, description: 'Page number' })
+  @IsOptional()
+  @Type(() => Number)
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional({ default: 10, description: 'Items per page' })
+  @IsOptional()
+  @Type(() => Number)
+  @Min(1)
+  limit?: number = 10;
+
+  @ApiPropertyOptional({ description: 'Filter by status (e.g., active)' })
+  @IsOptional()
+  @IsString()
+  status?: string[];
+
+  @ApiPropertyOptional({ description: 'Filter by role (e.g., admin, user)' })
+  @IsOptional()
+  @IsString()
+  role?: string;
+
+  @ApiPropertyOptional({ description: 'Search keyword' })
+  @IsOptional()
+  @IsString()
+  search: string;
+
+  @ApiPropertyOptional({ description: 'Sort field', example: 'createdAt' })
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+}
+
+export type MongooseFilter<T> = FilterQuery<T>;
+
+export interface PagedResponse<T> {
+  data: T[];
+  totalPages: number;
+  currentPage: number;
 }

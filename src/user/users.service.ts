@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { User } from './users.entity';
-import { SignUpDto } from './users.dto';
+import { PagedResponse, QueryParamsDto, SignUpDto } from './users.dto';
 import type { IUserRepository, IUserService } from './user.interfaces';
 import { USER_REPOSITORY } from './user.interfaces';
 import type { IHashingService } from 'src/hashing/hashing.interface';
@@ -37,6 +37,10 @@ export class UserService implements IUserService {
     }
 
     return userData;
+  }
+
+  async findAll(data: QueryParamsDto): Promise<PagedResponse<User>> {
+    return this.userRepo.findAll(data);
   }
 
   async update(id: string, data: Partial<User>): Promise<User | null> {
