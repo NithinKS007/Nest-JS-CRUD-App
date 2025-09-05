@@ -10,6 +10,8 @@ import type { IUserRepository, IUserService } from './user.interfaces';
 import { USER_REPOSITORY } from './user.interfaces';
 import type { IHashingService } from 'src/hashing/hashing.interface';
 import { HASHING_SERVICE } from 'src/hashing/hashing.interface';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { stringify } from 'qs';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -18,6 +20,7 @@ export class UserService implements IUserService {
     private readonly userRepo: IUserRepository,
     @Inject(HASHING_SERVICE)
     private readonly hashingService: IHashingService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(data: SignUpDto): Promise<User> {
@@ -31,19 +34,26 @@ export class UserService implements IUserService {
 
   async findById(id: string): Promise<User | null> {
     const userData = await this.userRepo.findById(id);
-
     if (!userData) {
       throw new NotFoundException('user not found');
     }
-
     return userData;
   }
 
-  async findAll(data: QueryParamsDto): Promise<PagedResponse<User>> {
-    return this.userRepo.findAll(data);
+  async findAll(query: QueryParamsDto): Promise<PagedResponse<User>> {
+    const key = `users:${stringify(query)}`;
+    const cached = await this.cacheManager.get<PagedResponse<User>>(key);
+    if (cached) return cached;
+    const users = await this.userRepo.findAll(query);
+    await this.cacheManager.set(key, users, 10);
+    return users;
   }
 
   async update(id: string, data: Partial<User>): Promise<User | null> {
+    const userData = await this.userRepo.findById(id);
+    if (!userData) {
+      throw new NotFoundException('user not found');
+    }
     const updatedUser = await this.userRepo.update(id, data);
     if (!updatedUser) {
       throw new BadRequestException('Failed to update user');

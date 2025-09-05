@@ -7,6 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/user/users.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerConfigService } from './throttle.config.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -17,9 +18,14 @@ import { ThrottlerConfigService } from './throttle.config.service';
     }),
     AuthModule,
     UsersModule,
-     ThrottlerModule.forRootAsync({
+    ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       useClass: ThrottlerConfigService,
+    }),
+    CacheModule.register({
+      ttl: 60,
+      max: 100,
+      isGlobal: true,
     }),
   ],
   controllers: [],
