@@ -1,10 +1,12 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Inject,
   Param,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -20,10 +22,11 @@ import {
   FindAllUsersDoc,
   FindUserByIdDoc,
   PaginatedUserResponseDto,
-} from 'src/shared/decorators/swagger.doc.decorator';
+  UpdateUserByIdDoc,
+} from 'src/common/decorators/swagger.doc.decorator';
 import { QueryParamsDto } from './users.dto';
-import { RolesGuard } from 'src/shared/guards/role.guard';
-import { Roles } from 'src/shared/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/role.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -46,10 +49,25 @@ export class UserController {
     return { data: userData, message: 'User found successfully' };
   }
 
+  @Put()
+  @Version('1')
+  @UpdateUserByIdDoc()
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  async findUserByIdAndUpdate(
+    @Param('id') id: string,
+    @Body() data: Partial<User>,
+    @Req() req: customReq,
+  ): Promise<CustomApiResponse<Omit<User, 'password'> | null>> {
+    const userId = req?.user?.id!;
+    const userData = await this.userService.update(userId, data);
+    return { data: userData, message: 'User updated successfully' };
+  }
+
   @Get()
   @Version('1')
   @FindAllUsersDoc()
-  @UseGuards(AuthGuard('jwt'),RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @HttpCode(HttpStatus.OK)
   async findAll(

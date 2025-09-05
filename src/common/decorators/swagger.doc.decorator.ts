@@ -15,6 +15,7 @@ import {
   SignInResDto,
   SignUpDto,
   SignUpResDto,
+  UserDto,
   UserResDto,
 } from 'src/user/users.dto';
 
@@ -25,7 +26,11 @@ type ErrorResponse = {
 
 interface SwaggerDocOptions {
   summary: string;
-  body?: Type<unknown>;
+  body?: {
+    type: Type<unknown>;
+    description?: string;
+  };
+
   response: {
     status: number;
     description: string;
@@ -62,7 +67,12 @@ export const SwaggerDoc = (options: SwaggerDocOptions) => {
   ];
 
   if (options.body) {
-    decorators.push(ApiBody({ type: options.body }));
+    decorators.push(
+      ApiBody({
+        type: options.body.type,
+        description: options.body.description,
+      }),
+    );
   }
 
   if (options.bearerAuth) {
@@ -104,7 +114,7 @@ export const SwaggerDoc = (options: SwaggerDocOptions) => {
 export const SignInSwaggerDoc = () =>
   SwaggerDoc({
     summary: 'Sign in user and return token',
-    body: SignInDto,
+    body: { type: SignInDto },
     response: {
       status: 200,
       description: 'Login successful',
@@ -120,7 +130,7 @@ export const SignInSwaggerDoc = () =>
 export const SignUpSwaggerDoc = () =>
   SwaggerDoc({
     summary: 'Register a new user',
-    body: SignUpDto,
+    body: { type: SignUpDto },
     response: {
       status: 201,
       description: 'User created successfully',
@@ -142,6 +152,25 @@ export const FindUserByIdDoc = () =>
     },
     bearerAuth: true,
     errors: [{ status: 404, description: 'User not found' }],
+  });
+
+export const UpdateUserByIdDoc = () =>
+  SwaggerDoc({
+    summary: 'Update user by ID',
+    response: {
+      status: 200,
+      description: 'User updated successfully.',
+      type: UserResDto,
+    },
+    bearerAuth: true,
+    body: {
+      type: UserDto,
+      description: 'Fields to update',
+    },
+    errors: [
+      { status: 400, description: 'Invalid input' },
+      { status: 404, description: 'User not found' },
+    ],
   });
 
 @ApiExtraModels(UserResDto)

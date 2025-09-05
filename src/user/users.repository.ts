@@ -1,4 +1,4 @@
-import { BaseRepository } from 'src/shared/baseRepositoy';
+import { BaseRepository } from 'src/common/baseRepositoy';
 import { User, UserDocument } from './users.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';

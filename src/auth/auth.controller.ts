@@ -26,10 +26,10 @@ import {
   CustomApiResponse,
   SignInSwaggerDoc,
   SignUpSwaggerDoc,
-} from 'src/shared/decorators/swagger.doc.decorator';
+} from 'src/common/decorators/swagger.doc.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import type { customReq } from 'src/types/express';
-import { createCsrfProtection } from 'src/shared/csrf.config';
+import { createCsrfProtection } from 'src/common/csrf.config';
 import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('auth')

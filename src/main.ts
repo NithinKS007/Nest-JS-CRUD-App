@@ -5,9 +5,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
-import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import cookieparser from 'cookie-parser';
-import { createCsrfProtection } from './shared/csrf.config';
+import { createCsrfProtection } from './common/csrf.config';
 import { JwtService } from '@nestjs/jwt';
 
 async function bootstrap() {

@@ -1,4 +1,4 @@
-import { IBaseRepository } from 'src/shared/Ibase.repository';
+import { IBaseRepository } from 'src/common/Ibase.repository';
 import { User, UserDocument } from './users.entity';
 import { PagedResponse, QueryParamsDto, SignUpDto } from './users.dto';
 
